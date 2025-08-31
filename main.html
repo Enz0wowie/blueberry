@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blueberry | Discord Webhook Manager</title>
+    <style>
+        :root {
+            --primary: #5865F2;
+            --primary-dark: #4752c4;
+            --dark: #2C2F33;
+            --darker: #23272A;
+            --light: #F6F6F6;
+            --grey: #99AAB5;
+            --success: #57F287;
+            --danger: #ED4245;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: var(--grey);
+            font-size: 1.1rem;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--darker);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        button.danger {
+            background-color: var(--danger);
+        }
+        
+        button.danger:hover {
+            background-color: #c03537;
+        }
+        
+        .logs {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: var(--darker);
+            padding: 15px;
+            border-radius: 8px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .log-time {
+            color: var(--grey);
+            margin-right: 10px;
+        }
+        
+        .log-success {
+            color: var(--success);
+        }
+        
+        .log-error {
+            color: var(--danger);
+        }
+        
+        .avatar-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-top: 10px;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+        
+        .flex-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .flex-row > div {
+            flex: 1;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px 0;
+            color: var(--grey);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: var(--grey);
+            cursor: help;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark);
+            color: var(--light);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Blueberry</h1>
+        <p class="tagline">Minimal Discord Webhook Manager</p>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2 class="card-title">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.59 13H3a1 1 0 0 1 0-2h15.59l-5.3-5.3a1 1 0 1 1 1.42-1.4l7 7a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.42-1.4l5.3-5.3z"/>
+                </svg>
+                Webhook Configuration
+            </h2>
+            
+            <div class="form-group">
+                <label for="webhook-url">Webhook URL</label>
+                <input type="text" id="webhook-url" placeholder="https://discord.com/api/webhooks/..." />
+            </div>
+            
+            <div class="flex-row">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Webhook username" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="avatar-url">Avatar URL 
+                        <span class="tooltip">?
+                            <span class="tooltip-text">URL to an image for the avatar</span>
+                        </span>
+                    </label>
+                    <input type="text" id="avatar-url" placeholder="https://example.com/avatar.png" />
+                    <img id="avatar-preview" class="avatar-preview" src="" alt="Avatar preview" style="display: none;" />
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message Content</label>
+                <textarea id="message" placeholder="Enter your message here..."></textarea>
+            </div>
+            
+            <div class="flex-row">
+                <div class="form-group">
+                    <label for="spam-count">Spam Count</label>
+                    <input type="number" id="spam-count" value="1" min="1" max="20" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="delay">Delay (ms)</label>
+                    <input type="number" id="delay" value="1000" min="0" max="10000" />
+                </div>
+            </div>
+            
+            <div class="flex-row">
+                <button id="send-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                    Send Message
+                </button>
+                
+                <button id="spam-btn" class="danger">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M13 14h-2v-4h2v4zm0-6h-2V6h2v2zm10-4v16H1V4h4V2h2v2h8V2h2v2h4zM3 18h16V8H3v10z"/>
+                    </svg>
+                    Start Spam
+                </button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17 10H7v2h10v-2zm-5 4h5v2h-5zm5-8h-5v2h5V6zm-7-2v2H7V4h3zm0 12H7v2h3v-2zm-3-4h3v2H7v-2zm12-2v10H5V10h14zm0-2H5V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2v4z"/>
+                </svg>
+                Activity Logs
+            </h2>
+            
+            <div class="logs" id="logs">
+                <div class="log-entry">
+                    <span class="log-time">[12:00:00]</span>
+                    <span>System initialized. Ready to send webhook messages.</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <button id="clear-logs-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Clear Logs
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Blueberry &copy; 2023 | Discord Webhook Manager</p>
+        <p>Note: This is a client-side tool. Webhooks are sent directly from your browser.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const webhookUrl = document.getElementById('webhook-url');
+            const username = document.getElementById('username');
+            const avatarUrl = document.getElementById('avatar-url');
+            const avatarPreview = document.getElementById('avatar-preview');
+            const message = document.getElementById('message');
+            const spamCount = document.getElementById('spam-count');
+            const delay = document.getElementById('delay');
+            const sendBtn = document.getElementById('send-btn');
+            const spamBtn = document.getElementById('spam-btn');
+            const logs = document.getElementById('logs');
+            const clearLogsBtn = document.getElementById('clear-logs-btn');
+            
+            // Avatar preview
+            avatarUrl.addEventListener('input', function() {
+                if (avatarUrl.value) {
+                    avatarPreview.src = avatarUrl.value;
+                    avatarPreview.style.display = 'block';
+                } else {
+                    avatarPreview.style.display = 'none';
+                }
+            });
+            
+            // Add log entry
+            function addLog(text, isError = false) {
+                const now = new Date();
+                const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'log-time';
+                timeSpan.textContent = timeString;
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = isError ? 'log-error' : 'log-success';
+                textSpan.textContent = ` ${text}`;
+                
+                logEntry.appendChild(timeSpan);
+                logEntry.appendChild(textSpan);
+                
+                logs.appendChild(logEntry);
+                logs.scrollTop = logs.scrollHeight;
+            }
+            
+            // Send webhook message
+            async function sendWebhook() {
+                if (!webhookUrl.value) {
+                    addLog('Error: Webhook URL is required', true);
+                    return;
+                }
+                
+                if (!message.value) {
+                    addLog('Error: Message content is required', true);
+                    return;
+                }
+                
+                const payload = {
+                    content: message.value,
+                    username: username.value || 'Webhook',
+                    avatar_url: avatarUrl.value || null
+                };
+                
+                try {
+                    const response = await fetch(webhookUrl.value, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (response.ok) {
+                        addLog('Message sent successfully');
+                    } else {
+                        addLog(`Error: ${response.status} ${response.statusText}`, true);
+                    }
+                } catch (error) {
+                    addLog(`Error: ${error.message}`, true);
+                }
+            }
+            
+            // Spam webhook messages
+            let isSpamming = false;
+            let spamInterval;
+            
+            async function spamWebhook() {
+                if (isSpamming) {
+                    // Stop spamming
+                    clearInterval(spamInterval);
+                    isSpamming = false;
+                    spamBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M13 14h-2v-4h2v4zm0-6h-2V6h2v2zm10-4v16H1V4h4V2h2v2h8V2h2v2h4zM3 18h16V8H3v10z"/>
+                        </svg>
+                        Start Spam
+                    `;
+                    addLog('Spamming stopped');
+                    return;
+                }
+                
+                if (!webhookUrl.value) {
+                    addLog('Error: Webhook URL is required', true);
+                    return;
+                }
+                
+                if (!message.value) {
+                    addLog('Error: Message content is required', true);
+                    return;
+                }
+                
+                const count = parseInt(spamCount.value) || 1;
+                const delayMs = parseInt(delay.value) || 1000;
+                
+                if (count < 1 || count > 20) {
+                    addLog('Error: Spam count must be between 1 and 20', true);
+                    return;
+                }
+                
+                if (delayMs < 0 || delayMs > 10000) {
+                    addLog('Error: Delay must be between 0 and 10000 ms', true);
+                    return;
+                }
+                
+                isSpamming = true;
+                spamBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <path d="M6 6h12v12H6z"/>
+                    </svg>
+                    Stop Spam
+                `;
+                
+                addLog(`Started spamming ${count} messages with ${delayMs}ms delay`);
+                
+                let sent = 0;
+                
+                spamInterval = setInterval(async () => {
+                    if (sent >= count) {
+                        clearInterval(spamInterval);
+                        isSpamming = false;
+                        spamBtn.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M13 14h-2v-4h2v4zm0-6h-2V6h2v2zm10-4v16H1V4h4V2h2v2h8V2h2v2h4zM3 18h16V8H3v10z"/>
+                            </svg>
+                            Start Spam
+                        `;
+                        addLog('Spamming completed');
+                        return;
+                    }
+                    
+                    await sendWebhook();
+                    sent++;
+                }, delayMs);
+            }
+            
+            // Event listeners
+            sendBtn.addEventListener('click', sendWebhook);
+            spamBtn.addEventListener('click', spamWebhook);
+            
+            clearLogsBtn.addEventListener('click', function() {
+                logs.innerHTML = '';
+                addLog('Logs cleared');
+            });
+            
+            // Initialize with example webhook URL placeholder
+            webhookUrl.placeholder = 'https://discord.com/api/webhooks/123/abc';
+        });
+    </script>
+</body>
+</html>
