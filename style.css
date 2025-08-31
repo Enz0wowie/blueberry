@@ -1,117 +1,110 @@
-:root {
-    --primary: #5865F2;
-    --primary-dark: #4752c4;
-    --dark: #2C2F33;
-    --darker: #23272A;
-    --light: #F6F6F6;
-    --grey: #99AAB5;
-    --success: #57F287;
-    --danger: #ED4245;
-}
-
-* {
+/* General body styling */
+body {
+    background: #1e1e2f;
+    font-family: "Segoe UI", sans-serif;
+    color: #fff;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
 }
 
-body {
-    background-color: var(--darker);
-    color: var(--light);
-    line-height: 1.6;
-    padding: 20px;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-h1 {
-    color: var(--primary);
-    font-size: 2.5rem;
-    margin-bottom: 10px;
-}
-
-.tagline {
-    color: var(--grey);
-    font-size: 1.2rem;
-}
-
-section {
-    background: var(--dark);
-    padding: 25px;
+/* Card container */
+.card {
+    background: #2a2a40;
     border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    margin: 30px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
-h2 {
-    color: var(--primary);
+/* Card title */
+.card-title {
+    font-size: 20px;
     margin-bottom: 15px;
-    font-size: 1.8rem;
-    border-bottom: 2px solid var(--primary);
-    padding-bottom: 8px;
+    font-weight: bold;
+    text-align: center;
+    color: #9dc1ff;
 }
 
-p {
+/* Form groups */
+.form-group {
     margin-bottom: 15px;
-    color: var(--grey);
 }
 
-button {
-    background: var(--primary);
-    color: white;
+/* Labels */
+label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 6px;
+    color: #ccc;
+}
+
+/* Inputs + Textareas */
+input, textarea {
+    width: 100%;
+    padding: 10px;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
+    border-radius: 6px;
+    background: #1b1b2e;
+    color: #fff;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Buttons */
+button {
+    background: #5865f2;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: white;
+    font-size: 14px;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-    margin: 5px;
+    margin-top: 8px;
+    transition: 0.2s;
 }
 
 button:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
+    background: #4752c4;
 }
 
-button.danger {
-    background: var(--danger);
-}
-
-button.danger:hover {
-    background: #c9383a;
-}
-
-button.success {
-    background: var(--success);
-    color: black;
-}
-
-button.success:hover {
-    background: #4fdd77;
-}
-
-input[type="text"],
-input[type="url"] {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    background: var(--darker);
-    border: 1px solid var(--grey);
-    border-radius: 8px;
-    color: var(--light);
-}
-
-footer {
+/* Avatar preview */
+.avatar-preview {
+    margin-top: 10px;
     text-align: center;
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid var(--dark);
-    color: var(--grey);
+}
+.avatar-preview img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #5865f2;
+    object-fit: cover;
 }
 
+/* Logs */
+.logs {
+    margin-top: 20px;
+    padding: 10px;
+    background: #1b1b2e;
+    border-radius: 8px;
+    max-height: 250px;
+    overflow-y: auto;
+    font-size: 13px;
+}
+
+.log-entry {
+    margin-bottom: 6px;
+    padding: 6px;
+    border-left: 3px solid #5865f2;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
